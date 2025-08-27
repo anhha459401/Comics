@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Comics - Lịch sử xem{% endblock %}
+{% block content %}
+    <!-- BREADCRUMB -->
+    <div id="breadcrumb" class="section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <ul class="breadcrumb-tree">
+                        <li><a href="{% url 'core:index' %}">Trang chủ</a></li>
+                        <li class="active">Lịch sử xem</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /BREADCRUMB -->
+
+    <!-- SECTION -->
+    <div class="section">
+        <div class="container">
+            <div class="row">
+                <!-- STORE -->
+                <div id="store" class="col-md-12">
+                    <h3 class="title">Lịch sử xem truyện</h3>
+                    <!-- store top filter -->
+                    <div class="store-filter clearfix">
+                        <div class="store-sort">
+                            <label>
+                                Sắp xếp theo:
+                                <select class="input-select"
+                                    onchange="window.location.href='{% url 'comics:view_history' %}?sort=' + this.value + '&page={{ page_obj.number }}'"
+                                >
+                                    <option value="name_asc" {% if sort == 'name_asc' %}selected{% endif %}>Tên truyện từ A tới Z</option>
+                                    <option value="name_desc" {% if sort == 'name_desc' %}selected{% endif %}>Tên truyện từ Z tới A</option>
+                                    <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>Giá tăng dần</option>
+                                    <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Giá giảm dần</option>
+                                    <option value="date_asc" {% if sort == 'date_asc' %}selected{% endif %}>Ngày xem cũ nhất</option>
+                                    <option value="date_desc" {% if sort == 'date_desc' %}selected{% endif %}>Ngày xem mới nhất</option>
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+                    <!-- /store top filter -->
+
+                    <!-- store products -->
+                    <div class="row">
+                        {% for history in page_obj %}
+                            {% with comic=history.comic %}
+                            <div class="col-md-3 col-xs-6">
+                                <div class="product">
+                                    <div class="product-img">
+                                        <a href="{% url 'comics:comic_detail' slug=comic.slug %}"><img src="{{ comic.cover_image.url }}" alt="{{ comic.name }}"></a>
+                                        <div class="product-label">
+                                            {% if comic.sale > 0 %}
+                                                <span class="sale">-{{ comic.sale }}%</span>
+                                            {% endif %}
+                                            {% if comic.is_new %}
+                                                <span class="new">MỚI</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="product-body">
+                                        <p class="product-category">{{ comic.category }}</p>
+                                        <h3 class="product-name"><a href="{% url 'comics:comic_detail' slug=comic.slug %}">{{ comic.name }}</a></h3>
+                                        <h4 class="product-price">
+                                            {% if comic.sale > 0 %}
+                                                {{ comic.discounted_price|intcomma }}đ <del class="product-old-price">{{ comic.price|intcomma }}đ</del>
+                                            {% else %}
+                                                {{ comic.price|intcomma }}đ 
+                                            {% endif %}
+                                        </h4>
+                                        <div class="product-rating"></div>
+                                        <div class="product-btns">
+                                            {% if user.is_authenticated %}
+                                                <button class="add-to-wishlist">
+                                                    <i class="far fa-heart heart-icon" data-comic-id="{{ comic.id }}"></i><span class="tooltipp">Thêm yêu thích</span>
+                                                </button>
+                                                <a href="{% url 'comics:comic_detail' comic.slug %}">
+                                                    <button class="quick-view">
+                                                        <i class="fa-solid fa-eye"></i>
+                                                        <span class="tooltipp">Xem chi tiết</span>
+                                                    </button>
+                                                </a>
+                                                <button type="submit" class="add-to-cart-btn"
+                                                    {% if comic.stock == 0 %}
+                                                        style="cursor: not-allowed !important; opacity: 0.5;"
+                                                        disabled
+                                                    {% endif %}
+                                                    onclick="addToCart({{ comic.id}}, 1)"
+                                                >
+                                                    <i class="fa-solid fa-cart-shopping"></i><span class="tooltipp">Thêm vào giỏ</span>
+                                                </button>
+                                            {% else %}
+                                                <button class="add-to-wishlist" data-toggle="modal" data-target="#largeModal">
+                                                    <i class="far fa-heart"></i><span class="tooltipp">Thêm yêu thích</span>                                                
+                                                </button>
+                                                <a href="{% url 'comics:comic_detail' comic.slug %}">
+                                                    <button class="quick-view">
+                                                        <i class="fa-solid fa-eye"></i><span class="tooltipp">Xem chi tiết</span>                                                      
+                                                    </button>
+                                                </a>
+                                                <button class="add-to-cart-btn" data-toggle="modal" data-target="#largeModal">
+                                                    <i class="fa-solid fa-cart-shopping"></i><span class="tooltipp">Thêm vào giỏ</span>
+                                                </button>
+                                            {% endif %}      
+                                        </div>
+                                    </div>
+                                    {% if user.is_authenticated %}
+                                        <div class="add-to-cart"><a href="{% url 'cart:cart_detail' %}">
+                                            <button class="add-to-cart-btn"><i class="fa-solid fa-cart-shopping"></i>
+                                                Giỏ hàng
+                                            </button></a>
+                                        </div>
+                                    {% else %}
+                                        <div class="add-to-cart"><a data-toggle="modal" data-target="#largeModal">
+                                            <button class="add-to-cart-btn"><i class="fa-solid fa-cart-shopping"></i>
+                                                Giỏ hàng
+                                            </button></a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            {% if forloop.counter|divisibleby:2 %}
+                                <div class="clearfix visible-sm visible-xs"></div>
+                            {% endif %}
+
+                            {% if forloop.counter|divisibleby:4 %}
+                                <div class="clearfix visible-lg visible-md"></div>
+                            {% endif %}
+                            {% endwith %}
+                        {% empty %}
+                            <p>Chưa có truyện nào trong lịch sử xem.</p>
+                        {% endfor %}
+                    </div>
+                    <!-- /store products -->
+
+                    <!-- store bottom filter -->
+                    <div class="store-filter clearfix">
+                        <span class="store-qty">{{ display_range }}</span>
+                        <ul class="store-pagination">
+                            {% if page_obj.number != 1 %}
+                                <li><a href="?page=1&sort={{ sort }}"><i class="fa fa-angle-double-left"></i></a></li>
+                            {% endif %}
+
+                            {% if page_obj.has_previous %}
+                                <li><a href="?page={{ page_obj.previous_page_number }}&sort={{ sort }}"><i class="fa fa-angle-left"></i></a></li>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if num|add:"-2" <= page_obj.number and num|add:"2" >= page_obj.number %}
+                                    {% if page_obj.number == num %}
+                                        <li class="active">{{ num }}</li>
+                                    {% else %}
+                                        <li><a href="?page={{ num }}&sort={{ sort }}">{{ num }}</a></li>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <li><a href="?page={{ page_obj.next_page_number }}&sort={{ sort }}"><i class="fa fa-angle-right"></i></a></li>
+                            {% endif %}
+
+                            {% if page_obj.number != total_pages %}
+                                <li><a href="?page={{ total_pages }}&sort={{ sort }}"><i class="fa fa-angle-double-right"></i></a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    <!-- /store bottom filter -->
+                </div>
+                <!-- /STORE -->
+            </div>
+            <!-- /row -->
+        </div>
+        <!-- /container -->
+    </div>
+    <!-- /SECTION -->
+{% endblock %}

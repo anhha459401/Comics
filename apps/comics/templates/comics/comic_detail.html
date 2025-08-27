@@ -1,0 +1,455 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% block title %}Comics - {{ comic.name }} {% endblock %}
+{% block content %}
+
+    <!-- BREADCRUMB -->
+		<div id="breadcrumb" class="section">
+			<!-- container -->
+			<div class="container">
+				<!-- row -->
+				<div class="row">
+					<div class="col-md-12">
+						<ul class="breadcrumb-tree">
+							<li><a href="{% url 'core:index' %}">Trang chủ</a></li>
+							<li><a href="{% url 'comics:comic_list' %}">Sản phẩm</a></li>
+							<li class="active">Chi tiết sản phẩm</li>
+						</ul>
+					</div>
+				</div>
+				<!-- /row -->
+			</div>
+			<!-- /container -->
+		</div>
+		<!-- /BREADCRUMB -->
+
+		<!-- SECTION -->
+		<div class="section">
+			<!-- container -->
+			<div class="container">
+				<!-- row -->
+				<div class="row">
+					<!-- Product main img -->
+					<div class="col-md-5 col-md-push-2">
+						<div id="product-main-img">
+							<div class="product-preview">
+								<img src="{{ comic.cover_image.url }}" alt="{{ comic.name }}">
+							</div>
+
+							<div class="product-preview">
+								{% if comic.intro_image_1 %}
+									<img src="{{ comic.intro_image_1.url }}" alt="{{ comic.name }}">
+								{% else %}
+									<img src="{{ comic.cover_image.url }}" alt="{{ comic.name }}">
+								{% endif %}
+							</div>
+
+							<div class="product-preview">
+								{% if comic.intro_image_2 %}
+									<img src="{{ comic.intro_image_2.url }}" alt="{{ comic.name }}">
+								{% else %}
+									<img src="{{ comic.cover_image.url }}" alt="{{ comic.name }}">
+								{% endif %}
+							</div>
+
+							<div class="product-preview">
+								{% if comic.intro_image_3 %}
+									<img src="{{ comic.intro_image_3.url }}" alt="{{ comic.name }}">
+								{% else %}
+									<img src="{{ comic.cover_image.url }}" alt="{{ comic.name }}">
+								{% endif %}
+							</div>
+						</div>
+					</div>
+					<!-- /Product main img -->
+
+					<!-- Product thumb imgs -->
+					<div class="col-md-2  col-md-pull-5">
+						<div id="product-imgs">
+							<div class="product-preview">
+								<img src="{{ comic.cover_image.url }}" alt="{{ comic.name }}">
+							</div>
+
+							<div class="product-preview">
+								{% if comic.intro_image_1 %}
+									<img src="{{ comic.intro_image_1.url }}" alt="{{ comic.name }}">
+								{% else %}
+									<img src="{{ comic.cover_image.url }}" alt="{{ comic.name }}">
+								{% endif %}
+							</div>
+
+							<div class="product-preview">
+								{% if comic.intro_image_2 %}
+									<img src="{{ comic.intro_image_2.url }}" alt="{{ comic.name }}">
+								{% else %}
+									<img src="{{ comic.cover_image.url }}" alt="{{ comic.name }}">
+								{% endif %}
+							</div>
+
+							<div class="product-preview">
+								{% if comic.intro_image_3 %}
+									<img src="{{ comic.intro_image_3.url }}" alt="{{ comic.name }}">
+								{% else %}
+									<img src="{{ comic.cover_image.url }}" alt="{{ comic.name }}">
+								{% endif %}
+							</div>
+						</div>
+					</div>
+					<!-- /Product thumb imgs -->
+
+					<!-- Product details -->
+					<div class="col-md-5">
+						<div class="product-details">
+							<h2 class="product-name">{{ comic.name }}</h2>
+							<div class="product-rating-ctn">
+								<div class="product-rating">
+									{% if average_rating %}
+										{{ average_rating|floatformat:1 }}
+										<i class="fas fa-star"></i>
+										({{ total_reviews }} đánh giá)
+									{% else %}
+										(Chưa có đánh giá)
+									{% endif %}
+									<span style="margin-left: 55px;">{{ view_count }} lượt xem</span>
+								</div>
+							</div>
+
+							<div>
+								<h3 class="product-price">
+									{% if comic.sale > 0 %}
+										{{ comic.discounted_price|intcomma }}đ <del class="product-old-price">{{ comic.price|intcomma }}đ</del>
+									{% else %}
+										{{ comic.price|intcomma }}đ 
+									{% endif %}
+								</h3>
+                                <span class="product-btns">
+									{% if user.is_authenticated %}
+                                    	<i class="far fa-heart heart-icon" title="Thêm vào danh sách yêu thích" data-comic-id="{{ comic.id }}"></i>
+									{% else %}
+                                    	<i data-toggle="modal" data-target="#largeModal" class="far fa-heart" title="Thêm vào danh sách yêu thích" ></i>
+									{% endif %}
+                                </span>
+								{% if comic.stock == 0 %}
+                                    <span class="product-available">Hết hàng</span>
+                                {% endif %}
+                            </div>
+
+                            <ul class="product-links">
+								Thể loại:
+								<li><a href="{% url 'comics:comic_categories_by_slug' slug=comic.category.slug %}">{{ comic.category }}</a></li>
+							</ul>
+
+							<div class="product-options">
+								<label class="author">
+									Tác giả: <a href="{% url 'comics:comic_categories_by_author' author=comic.author %}">{{ comic.author }}</a>
+								</label>
+								<label class="publisher">
+									Nhà xuất bản: 
+									{% if comic.publisher %}
+										<a href="{% url 'comics:comic_categories_by_publisher' publisher=comic.publisher %}"> {{ comic.publisher }} </a>
+									{% else %}
+
+									{% endif %}
+								</label>
+							</div>
+							<i>Hàng còn: {{ comic.stock }}</i> <br> <br>
+							<div class="add-to-cart">
+								<div class="qty-label">
+									Số lượng:
+									<div class="input-number">
+										<input id="order-quantity" type="number" value="1" min="1" step="1" max="{{ comic.stock }}">
+										<span class="qty-up">+</span>
+										<span class="qty-down">-</span>
+									</div>
+								</div>
+								{% if user.is_authenticated %}
+									<button
+										type="submit"
+										class="add-to-cart-btn"
+										style="{% if comic.stock == 0 %}cursor: not-allowed !important; opacity: 0.5;{% endif %}"
+										{% if comic.stock == 0 %}disabled{% endif %}
+										onclick="addToCart({{ comic.id }}, $('#order-quantity').val())"
+									>
+
+										<i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
+									</button>
+								{% else %}
+									<button class="add-to-cart-btn" data-toggle="modal" data-target="#largeModal">
+										<i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
+									</button>
+								{% endif %}
+							</div>
+						</div>
+					</div>
+					<!-- /Product details -->
+
+					<!-- Product tab -->
+					<div class="col-md-12">
+						<div id="product-tab">
+							<!-- product tab nav -->
+							<ul class="tab-nav">
+								<li class="active"><a data-toggle="tab" href="#tab1">Mô tả</a></li>
+								<li ><a data-toggle="tab" href="#tab3">Đánh giá <span class="total_reviews">({{ total_reviews }})</span></a></li>
+							</ul>
+							<!-- /product tab nav -->
+
+							<!-- product tab content -->
+							<div class="tab-content">
+								<!-- tab1  -->
+								<div id="tab1" class="tab-pane fade in active">
+									<div class="row">
+										<div class="col-md-4 category-box">
+											<h4>Thể loại: {{ comic.category.name }}</h4>
+											<p style="text-indent: 2em;">{{ comic.category.description }}</p>
+										</div>
+										<div class="col-md-1"></div>
+										<div class="col-md-7 description-box">
+											<h4>Giới thiệu nội dung truyện</h4>
+											<p style="text-indent: 2em;">{{ comic.description }}</p>
+										</div>
+									</div>
+								</div>
+								<!-- /tab1  -->
+
+								<!-- tab3  -->
+								<div id="tab3" class="tab-pane fade in">
+									<div class="row">
+										<!-- Rating -->
+										<div class="col-md-3">
+											{% if average_rating %}
+												<div id="rating">
+												<div class="rating-avg">
+													<span>{{ average_rating|floatformat:1 }}</span>
+												</div>
+												{% load custom_filters %}
+												<ul class="rating" id="rating-list">
+													{% for i in "54321"|make_list %}
+														{% with int_i=i|add:"0" %} <!-- Chuyển chuỗi thành số nguyên -->
+															<li class="rating-row">
+																<div class="rating-stars">
+																	{% for j in "xxxxx"|make_list %}
+																		{% if forloop.counter <= int_i %}
+																			<i class="fas fa-star"></i>
+																		{% else %}
+																			<i class="far fa-star"></i>
+																		{% endif %}
+																	{% endfor %}
+																</div>
+																<div class="rating-progress">
+																	<div style="width: {{ rating_percentages|index:forloop.counter0 }}%;"></div>
+																</div>
+																<span class="sum">{{ rating_counts|index:forloop.counter0 }}</span>
+															</li>
+														{% endwith %}
+													{% endfor %}
+												</ul>
+											</div>
+											{% else %}
+											{% endif %}
+										</div>
+										<!-- /Rating -->
+
+										<!-- Reviews -->
+										<div class="col-md-6">
+											<div id="reviews">
+												<ul class="reviews" id="reviews-list">
+													{% for review in reviews %}
+														<li>
+															<div class="review-heading">
+																<h5 class="name">{{ review.user.username }}</h5>
+																<p class="date">{{ review.created_at|date:"d M Y, H:i A" }}</p>
+																<div class="review-rating">
+																	{% for i in "xxxxx"|make_list %}
+																		{% if forloop.counter <= review.rating %}
+																			<i class="fa fa-star"></i>
+																		{% else %}
+																			<i class="fa fa-star-o empty"></i>
+																		{% endif %}
+																	{% endfor %}
+																</div>
+															</div>
+															<div class="review-body">
+																<p>{{ review.comment|default:"Không có nhận xét" }}</p>
+															</div>
+														</li>
+													{% empty %}
+														<li>Chưa có nhận xét nào.</li>
+													{% endfor %}
+												</ul>
+												{% if page_obj.has_other_pages %}
+													<ul class="reviews-pagination" id="reviews-pagination">
+														{% if page_obj.has_previous %}
+															<li><a href="#" data-page="{{ page_obj.previous_page_number }}" class="pagination-link"><</a></li>
+														{% endif %}
+														{% for num in page_obj.paginator.page_range %}
+															<li class="{% if page_obj.number == num %}active{% endif %}">
+																<a href="#" data-page="{{ num }}" class="pagination-link">{{ num }}</a>
+															</li>
+														{% endfor %}
+														{% if page_obj.has_next %}
+															<li><a href="#" data-page="{{ page_obj.next_page_number }}" class="pagination-link">></a></li>
+														{% endif %}
+													</ul>
+												{% endif %}
+											</div>
+										</div>
+										<!-- /Reviews -->
+
+										<!-- Review Form -->
+										<div class="col-md-3">
+											<div id="review-form" data-comic-id="{{ comic.id }}">
+												{% if purchased %}
+													{% if not rating_obj %}
+														<!-- Hiển thị form để đánh giá nếu chưa đánh giá -->
+														<form class="review-form">
+															<textarea class="input" placeholder="Nhận xét của bạn" name="review"></textarea>
+															<div class="input-rating">
+																<span>Đánh giá của bạn: </span>
+																<div class="stars">
+																	<input id="star5" name="rating" value="5" type="radio"><label for="star5"></label>
+																	<input id="star4" name="rating" value="4" type="radio"><label for="star4"></label>
+																	<input id="star3" name="rating" value="3" type="radio"><label for="star3"></label>
+																	<input id="star2" name="rating" value="2" type="radio"><label for="star2"></label>
+																	<input id="star1" name="rating" value="1" type="radio"><label for="star1"></label>
+																</div>
+															</div>
+															<button type="submit" class="primary-btn">Gửi</button>
+														</form>
+													{% else %}
+														<!-- Hiển thị form để chỉnh sửa nếu đã đánh giá -->
+														<form class="review-form">
+															<textarea class="input" placeholder="Nhận xét của bạn" name="review">{{ rating_obj.comment }}</textarea>
+															<div class="input-rating">
+																<span>Đánh giá của bạn: </span>
+																<div class="stars">
+																	<input id="star5" name="rating" value="5" type="radio" {% if rating_obj.rating == 5 %}checked{% endif %}><label for="star5"></label>
+																	<input id="star4" name="rating" value="4" type="radio" {% if rating_obj.rating == 4 %}checked{% endif %}><label for="star4"></label>
+																	<input id="star3" name="rating" value="3" type="radio" {% if rating_obj.rating == 3 %}checked{% endif %}><label for="star3"></label>
+																	<input id="star2" name="rating" value="2" type="radio" {% if rating_obj.rating == 2 %}checked{% endif %}><label for="star2"></label>
+																	<input id="star1" name="rating" value="1" type="radio" {% if rating_obj.rating == 1 %}checked{% endif %}><label for="star1"></label>
+																</div>
+															</div>
+															<button type="submit" class="primary-btn">Chỉnh sửa</button>
+														</form>
+													{% endif %}
+												{% endif %}
+											</div>
+										</div>
+										<!-- /Review Form -->
+									</div>
+								</div>
+								<!-- /tab3  -->
+							</div>
+							<!-- /product tab content  -->
+						</div>
+					</div>
+					<!-- /product tab -->
+				</div>
+				<!-- /row -->
+			</div>
+			<!-- /container -->
+		</div>
+		<!-- /SECTION -->
+
+		<!-- Section -->
+		<div class="section">
+			<!-- container -->
+			<div class="container">
+				<!-- row -->
+				<div class="row">
+
+					<div class="col-md-12">
+						<div class="section-title text-center">
+							<h3 class="title">Sản phẩm liên quan</h3>
+						</div>
+					</div>
+
+					{% for comic in related_comics %}
+                        <div class="col-md-3 col-xs-6">
+                            <div class="product">
+                                <div class="product-img">
+                                    <img src="{{ comic.cover_image.url }}" alt="{{ comic.name }}">
+                                    <div class="product-label">
+										{% if comic.sale > 0 %}
+											<span class="sale">-{{ comic.sale }}%</span>
+										{% endif %}
+										{% if comic.is_new %}
+											<span class="new">MỚI</span>
+										{% endif %}
+									</div>
+                                </div>
+                                <div class="product-body">
+                                    <p class="product-category">{{ comic.category }}</p>
+                                    <h3 class="product-name"><a href="{% url 'comics:comic_detail' comic.slug %}">{{ comic.name }}</a></h3>
+									<h4 class="product-price">
+										{% if comic.sale > 0 %}
+											{{ comic.discounted_price|intcomma }}đ <del class="product-old-price">{{ comic.price|intcomma }}đ</del>
+										{% else %}
+											{{ comic.price|intcomma }}đ 
+										{% endif %}
+									</h4>
+                                    <div class="product-rating"></div> 
+                                    <div class="product-btns">
+										{% if user.is_authenticated %}
+											<button class="add-to-wishlist">
+												<i class="far fa-heart heart-icon" data-comic-id="{{ comic.id }}"></i><span class="tooltipp">Thêm yêu thích</span>
+											</button>
+											<a href="{% url 'comics:comic_detail' comic.slug %}">
+												<button class="quick-view">
+													<i class="fa-solid fa-eye"></i>
+													<span class="tooltipp">Xem chi tiết</span>
+												</button>
+											</a>
+											<button type="submit" class="add-to-cart-btn"
+												{% if comic.stock == 0 %}
+													style="cursor: not-allowed !important; opacity: 0.5;"
+													disabled
+												{% endif %}
+												onclick="addToCart({{ comic.id}}, 1)"
+											>
+												<i class="fa-solid fa-cart-shopping"></i><span class="tooltipp">Thêm vào giỏ</span>
+											</button>
+										{% else %}
+											<button class="add-to-wishlist" data-toggle="modal" data-target="#largeModal">
+												<i class="far fa-heart"></i><span class="tooltipp">Thêm yêu thích</span>                                                
+											</button>
+											<a href="{% url 'comics:comic_detail' comic.slug %}">
+												<button class="quick-view">
+													<i class="fa-solid fa-eye"></i><span class="tooltipp">Xem chi tiết</span>                                                      
+												</button>
+											</a>
+											<button class="add-to-cart-btn" data-toggle="modal" data-target="#largeModal">
+												<i class="fa-solid fa-cart-shopping"></i><span class="tooltipp">Thêm vào giỏ</span>
+											</button>
+										{% endif %}      
+									</div>
+                                </div>
+                                {% if user.is_authenticated %}
+									<div class="add-to-cart"><a href="{% url 'cart:cart_detail' %}">
+										<button class="add-to-cart-btn"><i class="fa-solid fa-cart-shopping"></i>
+											Giỏ hàng
+										</button></a>
+									</div>
+								{% else %}
+									<div class="add-to-cart"><a data-toggle="modal" data-target="#largeModal">
+										<button class="add-to-cart-btn"><i class="fa-solid fa-cart-shopping"></i>
+											Giỏ hàng
+										</button></a>
+									</div>
+								{% endif %}
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p>Không có sản phẩm nào.</p>
+                    {% endfor %}
+					<div class="clearfix visible-sm visible-xs"></div>
+				</div>
+				<!-- /row -->
+			</div>
+			<!-- /container -->
+		</div>
+		<!-- /Section -->
+<script src="{% static 'js/rating.js' %}"></script>
+
+{% endblock %}

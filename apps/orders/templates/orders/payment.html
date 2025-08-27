@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load static %}
+{% block title %}Comics - Thanh toán{% endblock %}
+{% block content %}
+  <!-- BREADCRUMB -->
+  <div id="breadcrumb" class="section">
+      <div class="container">
+          <div class="row">
+              <div class="col-md-12">
+                  <ul class="breadcrumb-tree">
+                      <li><a href="{% url 'core:index' %}">Trang chủ</a></li>
+                      <li><a href="{% url 'cart:cart_detail' %}">Giỏ hàng</a></li>
+                      <li class="active">Thanh toán</li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+  </div>
+  <!-- /BREADCRUMB -->
+
+  <!-- SECTION -->
+  <div class="section">
+      <div class="
+
+container">
+          <div class="row">
+              <!-- Order Details -->
+              <div class="col-md-7">
+                  <div class="section-title">
+                      <h3 class="title">Chi tiết đơn hàng</h3>
+                  </div>
+                  <div class="order-summary">
+                      <table class="table table-bordered">
+                          <thead>
+                              <tr>
+                                  <th class="text-center">Truyện</th>
+                                  <th class="text-center">Số lượng</th>
+                                  <th class="text-center">Giá</th>
+                                  <th class="text-center">Tổng</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for item in cart_items %}
+                              <tr>
+                                  <td>{{ item.comic.name }}</td>
+                                  <td class="text-center">{{ item.quantity }}</td>
+                                  <td class="text-right">{{ item.comic.discounted_price|intcomma }}đ</td>
+                                  <td class="text-right">{{ item.total_price|intcomma }}đ</td>
+                              </tr>
+                              {% endfor %}
+                          </tbody>
+                          <tfoot>
+                            <tr>
+                                <th class="text-center" colspan="3">Phí vận chuyển</th>
+                                <td class="text-right"><b>{{ shipping_fee|intcomma }}đ</b></td>
+                            </tr>
+                            <tr>
+                                <th class="text-center" colspan="3">Thành tiền</th>
+                                <td class="text-right"><b>{{ total_price|intcomma }}đ</b></td>
+                            </tr>
+                          </tfoot>
+                      </table>
+                      <button class="btn"><a href="{% url 'cart:cart_detail' %}" >Quay lại giỏ hàng</a></button>
+                  </div>
+              </div>
+              <!-- /Order Details -->
+
+              <!-- User Info & Payment -->
+              <div class="col-md-5 order-details">
+                <form method="post" id="checkout-form">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="checkout">
+
+    <!-- Thông tin nhận hàng -->
+    <div class="section-title text-center">
+        <h3 class="title">Thông tin nhận hàng</h3>
+    </div>
+    <div class="form-group">
+        <label>Họ tên</label>
+        <input type="text" class="form-control" value="{{ user_profile.user.username }}" disabled>
+    </div>
+    <div class="form-group">
+        <label for="order-address">Địa chỉ</label>
+        <input id="order-address" type="text" class="form-control" name="address"
+               value="{{ user_profile.address|default_if_none:'' }}" required>
+    </div>
+    <div class="form-group">
+        <label for="order-tel">Số điện thoại</label>
+        <input id="order-tel" type="text" class="form-control" name="phone_number"
+               value="{{ user_profile.phone_number|default_if_none:'' }}" required>
+    </div>
+
+    <!-- Phương thức thanh toán -->
+    <div class="section-title text-center mt-4">
+        <h3 class="title">Phương thức thanh toán</h3>
+    </div>
+    <div class="form-group">
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="payment_method" value="cod" id="cod" checked>
+            <label class="form-check-label" for="cod">Thanh toán khi nhận hàng (COD)</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="payment_method" value="vnpay" id="vnpay">
+            <label class="form-check-label" for="vnpay">Thanh toán qua VNPay</label>
+        </div>
+    </div>
+    <!-- Nút submit -->
+    <button type="submit" class="btn btn-primary btn-lg btn-block" id="confirm-payment">Xác nhận thanh toán</button>
+</form>
+
+              </div>
+              <!-- /User Info & Payment -->
+          </div>
+      </div>
+  </div>
+  <!-- /SECTION -->
+  <script src="{% static 'js/account.js' %}"></script>
+{% endblock %}

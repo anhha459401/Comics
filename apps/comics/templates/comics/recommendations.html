@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+   {% block content %}
+     <h2>Truyện tranh được đề xuất cho bạn</h2>
+     {% if request.user.userprofile.age or request.user.userprofile.gender %}
+       <p>Đề xuất dựa trên hành vi của nhóm người dùng cùng 
+       {% if request.user.userprofile.gender %}giới tính ({{ request.user.userprofile.get_gender_display }}){% endif %}
+       {% if request.user.userprofile.age %} và độ tuổi ({{ request.user.userprofile.age }}){% endif %}</p>
+     {% endif %}
+     <div class="comic-list">
+       {% for comic in comics %}
+         <div class="comic-item">
+           <a href="{% url 'comics:comic_detail' comic.slug %}">
+             <img src="{{ comic.cover_image.url }}" alt="{{ comic.name }}" style="max-width: 150px;">
+             <h3>{{ comic.name }}</h3>
+             <p>Thể loại: {{ comic.category.name }}</p>
+             <p>Tác giả: {{ comic.author }}</p>
+             <p>Giá: {{ comic.discounted_price }} VND</p>
+             <p>Đánh giá trung bình: {{ comic.average_rating|floatformat:1 }} sao</p>
+           </a>
+         </div>
+       {% empty %}
+         <p>Chưa có truyện được đề xuất.</p>
+       {% endfor %}
+     </div>
+   {% endblock %}

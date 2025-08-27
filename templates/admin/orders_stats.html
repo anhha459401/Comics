@@ -1,0 +1,139 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+ <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <h1>Thống kê doanh thu</h1>
+  
+
+  <!-- Form lọc -->
+  <div style="margin-bottom: 20px;">
+    <form method="GET" action="" style="display: flex; gap: 10px;">
+      <!-- Lọc theo năm -->
+      <div>
+        <label for="year">Chọn năm:</label>
+        <select name="year" id="year" onchange="this.form.submit()">
+          <option value="">Tất cả các năm</option>
+          {% for year in years %}
+            <option value="{{ year }}" {% if selected_year == year|stringformat:"s" %}selected{% endif %}>{{ year }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Lọc theo tháng -->
+      <div>
+        <label for="month">Chọn tháng:</label>
+        <select name="month" id="month" onchange="this.form.submit()">
+          <option value="">Tất cả các tháng</option>
+          {% for month in months %}
+            <option value="{{ month }}" {% if selected_month == month|stringformat:"s" %}selected{% endif %}>Tháng {{ month }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </form>
+  </div>
+
+  <!-- Biểu đồ doanh thu trong năm -->
+  <h2>Doanh thu trong năm</h2>
+  {% if not revenue_by_month %}
+    <p>Không có dữ liệu doanh thu trong năm này.</p>
+  {% else %}
+    <div style="max-width: 1200px; margin: 20px 0;">
+      <canvas id="revenueChartYear" width="1200" height="500"></canvas>
+    </div>
+    <script>
+      const ctxYear = document.getElementById('revenueChartYear').getContext('2d');
+      new Chart(ctxYear, {
+        type: 'bar',
+        data: {
+          labels: [{% for item in revenue_by_month %}"Tháng {{ item.month|date:'m-Y' }}",{% endfor %}],
+          datasets: [{
+            label: 'Doanh thu (VND)',
+            data: [{% for item in revenue_by_month %}{{ item.total|floatformat:2 }},{% endfor %}],
+            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: false,  // Tắt responsive để cố định kích thước
+          maintainAspectRatio: false,  // Cho phép điều chỉnh tỉ lệ độc lập
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: { display: true, text: 'Doanh thu (VND)' }
+            },
+            x: {
+              title: { display: true, text: 'Tháng' }
+            }
+          },
+          plugins: {
+            legend: { display: true, position: 'top' },
+            tooltip: {
+                callbacks: {
+                    label: (context) => {
+                        let value = context.raw || 0;
+                        return value.toLocaleString('vi-VN') + ' VND';
+                    }
+                }
+            }
+
+          }
+        }
+      });
+    </script>
+  {% endif %}
+
+  <!-- Biểu đồ doanh thu trong tháng -->
+  <h2>Doanh thu trong tháng</h2>
+  {% if not revenue_by_day %}
+    <p>Không có dữ liệu doanh thu trong tháng này.</p>
+  {% else %}
+    <div style="max-width: 1200px; margin: 20px 0;">
+      <canvas id="revenueChartMonth" width="1200" height="500"></canvas>
+    </div>
+    <script>
+      const ctxMonth = document.getElementById('revenueChartMonth').getContext('2d');
+      new Chart(ctxMonth, {
+        type: 'line',
+        data: {
+          labels: [{% for item in revenue_by_day %}"{{ item.day|date:'d-m-Y' }}",{% endfor %}],
+          datasets: [{
+            label: 'Doanh thu (VND)',
+            data: [{% for item in revenue_by_day %}{{ item.total|floatformat:2 }},{% endfor %}],
+            borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            fill: true,
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: false,  // Tắt responsive để cố định kích thước
+          maintainAspectRatio: false,  // Cho phép điều chỉnh tỉ lệ độc lập
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: { display: true, text: 'Doanh thu (VND)' }
+            },
+            x: {
+              title: { display: true, text: 'Ngày' }
+            }
+          },
+          plugins: {
+            legend: { display: true, position: 'top' },
+            tooltip: {
+              callbacks: {
+                  label: (context) => {
+                      let value = context.raw || 0;
+                      return value.toLocaleString('vi-VN') + ' VND';
+                  }
+              }
+            }
+          }
+        }
+      });
+    </script>
+  {% endif %}
+  <!-- Nút điều hướng -->
+    <div style="margin-bottom: 20px;">
+      <a href="{% url 'admin:orders_order_changelist' %}" class="button" style="margin-right: 10px; padding: 8px 16px;">Back</a>
+    </div>
+{% endblock %}

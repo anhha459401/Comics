@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Comics - Đăng nhập{% endblock %}
+{% block content %}
+  <!-- BREADCRUMB -->
+  <div id="breadcrumb" class="section">
+      <div class="container">
+          <div class="row">
+              <div class="col-md-12">
+                  <ul class="breadcrumb-tree">
+                      <li><a href="{% url 'core:index' %}">Trang chủ</a></li>
+                      <li class="active">Đăng nhập</li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+  </div>
+  <!-- /BREADCRUMB -->
+
+  <!-- SECTION -->
+  <div class="section">
+      <div class="container">
+          <div class="row">
+              <div class="col-md-6 col-md-offset-3">
+                  <div class="section-title text-center">
+                      <h3 class="title">Đăng nhập</h3>
+                  </div>
+                  <form method="POST" action="{% url 'accounts:login' %}" id="login_required-form">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="username-login_required">Tên đăng nhập</label>
+                        <input id="username-login_required" class="input" type="text" name="username-login" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password-login_required">Mật khẩu</label>
+                        <input id="password-login_required" class="input" type="password" name="password-login" required>
+                    </div>
+                    <button id="login_required-btn" class="primary-btn" type="submit">Đăng nhập</button>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </div>
+  <!-- /SECTION -->
+  <script src="{% static 'js/account.js' %}"></script>
+{% endblock %}

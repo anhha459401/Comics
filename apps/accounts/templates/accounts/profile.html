@@ -1,0 +1,173 @@
+{% extends 'base.html' %} 
+{% load static %}
+{% block title %}Comics - Tài khoản{% endblock %} 
+{% block content %}
+  <!-- BREADCRUMB -->
+  <div id="breadcrumb" class="section">
+      <div class="container">
+          <div class="row">
+              <div class="col-md-12">
+                  <ul class="breadcrumb-tree">
+                      <li><a href="{% url 'core:index' %}">Trang chủ</a></li>
+                      <li class="active">Tài khoản</li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+  </div>
+  <!-- /BREADCRUMB -->
+  
+  <!-- SECTION -->
+	<div class="section">
+		<!-- container -->
+		<div class="container">
+				<!-- row -->
+				<div class="row">
+					<div class="col-md-6">
+            <div class="section-title">
+              <h3 class="title">Thông tin tài khoản</h3>
+            </div>
+            <div class="row">
+              <div class="col-md-6 col-xs-6">
+                <div class="form-group">
+                  <label>Họ</label>
+                  <input class="input" type="text" value="{{ request.user.last_name }}" disabled>
+                </div>
+              </div>
+              <div class="col-md-6 col-xs-6">
+                <div class="form-group">
+                  <label>Tên</label>
+                  <input class="input" type="text" value="{{ request.user.first_name }}" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 col-xs-6">
+                <div class="form-group">
+                  <label>Ngày sinh</label>
+                  <input class="input" type="date" value="{% if user_profile.date_of_birth %}{{ user_profile.date_of_birth|date:'Y-m-d' }}{% else %} {% endif %}" disabled>
+                </div>
+              </div>
+              <div class="col-md-6 col-xs-6">
+                <div class="form-group">
+                  <label>Giới tính</label>
+                  <input class="input" type="text" value="{% if user_profile.gender == 'male' %}Nam{% elif user_profile.gender == 'female' %}Nữ{% else %}Khác{% endif %}" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 col-xs-6">
+                <div class="form-group">
+                  <label>Tên đăng nhập</label>
+                  <input class="input" type="text" value="{{ request.user.username }}" disabled>
+                </div>
+              </div>
+              <div class="col-md-6 col-xs-6">
+                <div class="form-group">
+                  <label>Số điện thoại</label>
+                  <input class="input" type="tel" value="{{ user_profile.phone_number }}" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+							<label>Email</label>
+							<input class="input" type="email" value="{{ request.user.email }}" disabled>
+						</div>
+						<div class="form-group">
+							<label>Địa chỉ</label>
+							<input class="input" type="text" value="{{ user_profile.address }}" disabled>
+						</div>
+					</div>
+				
+					<div class="col-md-6">
+            <div class="section-title text-center">
+              <h3 class="title">Cập nhật thông tin</h3>
+            </div>
+    
+            <div class="form-group text-center">
+              <button id="toggle-edit-profile" class="btn" type="button">Chỉnh sửa thông tin</button>
+              <button id="toggle-change-password" class="btn" type="button">Đổi mật khẩu</button>
+            </div>
+
+            <!--Edit Profile-->
+            <form method="POST" action="{% url 'accounts:update_profile' %}" id="edit-profile-form">
+              {% csrf_token %}
+              <div class="row">
+                <div class="col-md-6 col-xs-6">
+                  <div class="form-group">
+                    <label>Họ</label>
+                    <input id="edit-last-name" class="input" type="text" name="last_name" value="{{ request.user.last_name }}">
+                  </div>
+                </div>
+                <div class="col-md-6 col-xs-6">
+                  <div class="form-group">
+                    <label>Tên</label>
+                    <input id="edit-first-name" class="input" type="text" name="first_name" value="{{ request.user.first_name }}">
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 col-xs-6">
+                  <div class="form-group">
+                    <label>Ngày sinh</label>
+                    <input id="edit-dob" class="input" type="date" name="dob" value="{{ user_profile.date_of_birth|date:'Y-m-d' }}" required>
+                  </div>
+                </div>
+                <div class="col-md-6 col-xs-6">
+                  <div class="form-group">
+                    <label>Giới tính</label>
+                    <select id="edit-gender" class="input" name="gender" required>
+                      <option value="male" {% if user_profile.gender == 'male' %}selected{% endif %}>Nam</option>
+                      <option value="female" {% if user_profile.gender == 'female' %}selected{% endif %}>Nữ</option>
+                      <option value="other" {% if user_profile.gender == 'other' %}selected{% endif %}>Khác</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Địa chỉ</label>
+                <input id="edit-address" class="input" type="text" name="address" value="{{ user_profile.address }}" required>
+              </div>
+              <div class="form-group">
+                <label>Số điện thoại</label>
+                <input id="edit-tel" class="input" type="tel" name="phone_number" value="{{ user_profile.phone_number }}" required>
+              </div>
+              <div class="form-group">
+                <label>Email</label>
+                <input id="edit-email" class="input" type="email" name="email" value="{{ request.user.email }}" required>
+              </div>
+              <div class="form-group">
+                <label>Mật khẩu (bắt buộc nếu thay đổi số điện thoại hoặc email)</label>
+                <input class="input" type="password" name="current-password">
+              </div>
+              <button id="edit-profile-btn" type="submit" class="primary-btn">Lưu thay đổi</button>
+            </form>
+            <!--Edit Profile-->
+
+            <!--Change Password-->
+            <form method="POST" action="{% url 'accounts:change_password' %}" id="change-password-form">
+              {% csrf_token %}
+              <div class="form-group">
+                <label for="current-password">Mật khẩu hiện tại</label>
+                <input id="current-password" class="input" type="password" name="current-password" required>
+              </div>
+              <div class="form-group">
+                <label for="new-password">Mật khẩu mới</label>
+                <input id="new-password" class="input" type="password" name="new-password" required>
+              </div>
+              <div class="form-group">
+                <label for="confirm-new-password">Nhập lại mật khẩu mới</label>
+                <input id="confirm-new-password" class="input" type="password" name="confirm-new-password" required>
+              </div>
+              <button id="change-password-btn" class="primary-btn" type="submit">Lưu thay đổi</button>
+            </form>
+            <!--Change Password-->
+					</div>
+				</div>
+				<!-- /row -->
+		</div>
+		<!-- /container -->
+	</div>
+	<!-- /SECTION -->
+  <script src="{% static 'js/account.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+  <h1>Thống kê trạng thái đơn hàng</h1>
+
+  <!-- Form lọc -->
+  <div style="margin-bottom: 20px;">
+    <form method="GET" action="" style="display: flex; gap: 10px;">
+      <div>
+        <label for="year">Chọn năm:</label>
+        <select name="year" id="year" onchange="this.form.submit()">
+          <option value="">Tất cả các năm</option>
+          {% for year in years %}
+            <option value="{{ year }}" {% if selected_year == year|stringformat:"s" %}selected{% endif %}>{{ year }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="month">Chọn tháng:</label>
+        <select name="month" id="month" onchange="this.form.submit()">
+          <option value="">Tất cả các tháng</option>
+          {% for month in months %}
+            <option value="{{ month }}" {% if selected_month == month|stringformat:"s" %}selected{% endif %}>Tháng {{ month }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </form>
+  </div>
+
+  <!-- Bảng trạng thái thanh toán -->
+  <h2>Số lượng đơn hàng theo trạng thái thanh toán</h2>
+  {% if not payment_status_counts %}
+    <p>Không có dữ liệu trạng thái thanh toán.</p>
+  {% else %}
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+      <thead>
+        <tr style="background-color: #f8f9fa;">
+          <th style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">Trạng thái thanh toán</th>
+          <th style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">Số lượng</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in payment_status_counts %}
+          <tr>
+            <td style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">
+              {% if item.payment_status == "unpaid" %}Chưa thanh toán
+              {% elif item.payment_status == "paid" %}Đã thanh toán
+              {% elif item.payment_status == "refunded" %}Đã hoàn tiền
+              {% elif item.payment_status == "failed" %}Thất bại
+              {% else %}Không xác định
+              {% endif %}
+            </td>
+            <td style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">{{ item.count }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+
+  <!-- Bảng trạng thái đơn hàng -->
+  <h2>Số lượng đơn hàng theo trạng thái đơn</h2>
+  {% if not order_status_counts %}
+    <p>Không có dữ liệu trạng thái đơn hàng.</p>
+  {% else %}
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; text-align: center;">
+      <thead>
+        <tr style="background-color: #f8f9fa;">
+          <th style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">Trạng thái đơn</th>
+          <th style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">Số lượng</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in order_status_counts %}
+          <tr>
+            <td style="padding: 10px; border: 1px solid #dee2e6;">
+              {% if item.status == "pending" %}Chờ xử lý
+              {% elif item.status == "confirmed" %}Đã xác nhận
+              {% elif item.status == "preparing" %}Đang chuẩn bị hàng
+              {% elif item.status == "shipping" %}Đang giao hàng
+              {% elif item.status == "delivered" %}Giao hàng thành công
+              {% elif item.status == "cancelled" %}Đã hủy
+              {% elif item.status == "returned" %}Đã trả hàng
+              {% else %}Không xác định
+              {% endif %}
+            </td>
+            <td style="padding: 10px; border: 1px solid #dee2e6; text-align: center; text-align: center;">{{ item.count }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+  <!-- Nút điều hướng -->
+  <div style="margin-bottom: 20px;">
+    <a href="{% url 'admin:orders_order_changelist' %}" class="button" style="margin-right: 10px; padding: 8px 16px;">Back</a>
+  </div>
+{% endblock %}

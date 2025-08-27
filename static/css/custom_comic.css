@@ -1,0 +1,19 @@
+#id_is_active {
+  display: flex;
+}
+/* apps/comics/static/comics/css/admin_stats.css */
+.change-list table#result_list th,
+.change-list table#result_list td {
+  text-align: center; /* Căn giữa nội dung tất cả các cột */
+}
+
+.change-list table#result_list th a,
+.change-list table#result_list td a {
+  text-align: center; /* Căn giữa nếu có liên kết */
+  text-decoration: none; /* Giữ style mặc định */
+}
+
+.change-list table#result_list th a:hover,
+.change-list table#result_list td a:hover {
+  text-decoration: underline; /* Giữ hiệu ứng hover mặc định */
+}

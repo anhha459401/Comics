@@ -1,0 +1,36 @@
+{% load humanize %}
+
+<div class="cart-list">
+    {% for item in cart_items %}
+    <div class="product-widget" data-comic-id="{{ item.comic.id }}">
+        <div class="product-img">
+          <img src="{{ item.comic.cover_image.url }}" alt="{{ item.comic.name }}" />
+        </div>
+        <div class="product-body">
+            <h3 class="product-name">
+                <a href="{% url 'comics:comic_detail' item.comic.slug %}">{{ item.comic.name }}</a>
+            </h3>
+            <h4 class="product-price">
+                <span class="qty">{{ item.quantity }}x</span>{{ item.comic.discounted_price|intcomma }}đ
+            </h4>
+        </div>
+        <button class="delete" onclick="removeFromCart({{ item.comic.id }})">
+            <i class="fa fa-close"></i>
+        </button>
+    </div>
+    {% empty %}
+    <div class="product-widget">
+        <p>Giỏ hàng trống</p>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="cart-summary" id="cart-summary">
+    <small>Đã chọn {{ cart_items.count }} sản phẩm</small>
+    <h5>Tổng: {{ total_price|intcomma }}đ</h5>
+</div>
+
+<div class="cart-btns">
+    <a href="{% url 'cart:cart_detail' %}">Xem giỏ hàng</a>
+    <a href="{% url 'orders:payment' %}">Đặt hàng <i class="fa fa-arrow-circle-right"></i></a>
+</div>

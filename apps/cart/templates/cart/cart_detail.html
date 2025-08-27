@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load static %}
+{% block title %}Comics - Giỏ hàng{% endblock %}
+{% block content %}
+  <!-- BREADCRUMB -->
+  <div id="breadcrumb" class="section">
+      <div class="container">
+          <div class="row">
+              <div class="col-md-12">
+                  <ul feeding class="breadcrumb-tree">
+                      <li><a href="{% url 'core:index' %}">Trang chủ</a></li>
+                      <li class="active">Giỏ hàng</li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+  </div>
+  <!-- /BREADCRUMB -->
+
+  <!-- SECTION -->
+  <div class="section">
+      <div class="container">
+          <div class="row">
+              <div class="col-md-12">
+                <h3>Giỏ hàng của bạn</h3>
+                <div id="cart-detail-content">
+                    {% include "cart/cart_detail_partial.html" %}
+                </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  <!-- /SECTION -->
+  {% comment %} <script src="{% static 'js/cart.js' %}"></script> {% endcomment %}
+{% endblock %}

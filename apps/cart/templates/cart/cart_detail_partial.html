@@ -1,0 +1,55 @@
+{% load humanize %}
+{% if cart_items %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th class="text-center">Truyện</th>
+                <th class="text-center">Hình ảnh</th>
+                <th class="text-center">Giá</th>
+                <th class="text-center">Số lượng</th>
+                <th class="text-center">Tổng</th>
+                <th class="text-center">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart_items %}
+            <tr class="comic-cart-detail" data-comic-id="{{ item.comic.id }}">
+                <td><a href="{% url 'comics:comic_detail' slug=item.comic.slug %}">{{ item.comic.name }}</a></td>
+                <td class="text-center">
+                    {% if item.comic.cover_image %}
+                    <a href="{% url 'comics:comic_detail' slug=item.comic.slug %}">
+                        <img src="{{ item.comic.cover_image.url }}" alt="{{ item.comic.name }}" style="max-width: 60px;">
+                    </a>
+                    {% else %}
+                    <span>Không có hình ảnh</span>
+                    {% endif %}
+                </td>
+                <td class="text-center">{{ item.comic.discounted_price|intcomma }}đ</td>
+                <td class="text-center">
+                    <input id="update-comic" type="number" value="{{ item.quantity }}" min="1" max="{{ item.comic.stock }}"
+                        onchange="updateComicQuantity({{item.comic.id}}, $('#update-comic').val())"
+                    >
+                </td>
+                <td class="text-center">{{ item.total_price|intcomma }}đ</td>
+                <td class="text-center">
+                    <button onclick="removeFromCart({{ item.comic.id }})" class="btn btn-sm btn-danger">Xóa</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+<div class="row">
+    <div class="col-md-6">
+        <h4>Tổng: {{ total_price|intcomma }}đ</h4>
+    </div>
+    <div class="col-md-6 text-right">
+        <a href="{% url 'core:index' %}" class="btn btn-primary">Tiếp tục mua sắm</a>
+        <a href="{% url 'orders:payment' %}" class="btn btn-success">Đặt hàng</a>
+    </div>
+</div>
+{% else %}
+<p class="text-center">Giỏ hàng của bạn đang trống.</p>
+<div class="text-center">
+    <a href="{% url 'core:index' %}" class="btn btn-primary">Tiếp tục mua sắm</a>
+</div>
+{% endif %}

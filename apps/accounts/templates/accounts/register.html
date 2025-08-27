@@ -1,0 +1,146 @@
+{% extends 'base.html' %} 
+{% load static %} 
+{% block title %}Comics - Đăng ký{% endblock %} 
+{% block content %}
+<!-- BREADCRUMB -->
+<div id="breadcrumb" class="section">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <ul class="breadcrumb-tree">
+          <li><a href="{% url 'core:index' %}">Trang chủ</a></li>
+          <li class="active">Đăng ký</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /BREADCRUMB -->
+
+<!-- SECTION -->
+<div class="section">
+  <!-- container -->
+  <div class="container">
+    <!-- form -->
+    <form
+      method="POST"
+      action="{% url 'accounts:register' %}"
+      id="registration-form"
+    >
+      {% csrf_token %}
+      <div class="section-title">
+        <h3 class="title">Đăng ký tài khoản</h3>
+      </div>
+      <!-- row -->
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="last_name">Họ</label>
+            <input id="last_name" class="input" type="text" name="last_name" />
+          </div>
+          <div class="form-group">
+            <label for="first_name">Tên</label>
+            <input
+              id="first_name"
+              class="input"
+              type="text"
+              name="first_name"
+            />
+          </div>
+          <div class="form-group">
+            <label for="dob">Ngày sinh <span>*</span></label>
+            <input id="dob" class="input" type="date" name="dob" required />
+          </div>
+          <div class="form-group">
+            <label for="gender">Giới tính</label>
+            <br />
+            <select id="gender" name="gender" required>
+              <option value="male">Nam</option>
+              <option value="female">Nữ</option>
+              <option value="other">Khác</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="address">Địa chỉ <span>*</span></label>
+            <input
+              id="address"
+              class="input"
+              type="text"
+              name="address"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="tel">Số điện thoại <span>*</span></label>
+            <input id="tel" class="input" type="tel" name="tel" required />
+          </div>
+          <div class="form-group">
+            <label for="email">Email <span>*</span></label>
+            <input
+              id="email"
+              class="input"
+              type="email"
+              name="email"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="username">Tên đăng nhập <span>*</span></label>
+            <input
+              id="username"
+              class="input"
+              type="text"
+              name="username"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="password">Mật khẩu <span>*</span></label>
+            <input
+              id="password"
+              class="input"
+              type="password"
+              name="password"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="confirm_password"
+              >Nhập lại mật khẩu <span>*</span></label
+            >
+            <input
+              id="confirm_password"
+              class="input"
+              type="password"
+              name="confirm_password"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <p class="register-text">
+              Bạn đã có tài khoản? Bấm để
+              <a
+                class="login-btn-form"
+                data-toggle="modal"
+                data-target="#largeModal"
+                >đăng nhập</a
+              >
+            </p>
+            <button id="register-btn" class="primary-btn" type="submit">
+              Đăng ký
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- /row -->
+    </form>
+    <!-- /form -->
+  </div>
+  <!-- /container -->
+</div>
+<!-- /SECTION -->
+<script src="{% static 'js/account.js' %}"></script>
+{% endblock %}

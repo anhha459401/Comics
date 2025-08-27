@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% block title %}Comics - Đơn hàng{% endblock %}
+{% block content %}
+  <!-- BREADCRUMB -->
+  <div id="breadcrumb" class="section">
+      <div class="container">
+          <div class="row">
+              <div class="col-md-12">
+                  <ul class="breadcrumb-tree">
+                      <li><a href="{% url 'core:index' %}">Trang chủ</a></li>
+                      <li class="active">Đơn hàng</li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+  </div>
+  <!-- /BREADCRUMB -->
+
+  <!-- SECTION -->
+  <div class="section">
+      <div class="container">
+          <div class="row">
+              <div class="col-md-12">
+                  <div class="section-title text-right mb-4">
+                      <form method="get" class="form-inline">
+                          <select name="status" class="form-control" onchange="this.form.submit()">
+                              <!-- Tùy chọn "Tất cả" -->
+                              <option value="all" {% if status_filter == "all" %}selected{% endif %}>Tất cả</option>
+                              {% for choice in status_choices %}
+                                  <option value="{{ choice }}" {% if status_filter == choice %}selected{% endif %}>
+                                      <!-- Sử dụng ánh xạ trực tiếp từ ORDER_STATUS_CHOICES -->
+                                      {% for status_choice in ORDER_STATUS_CHOICES %}
+                                          {% if status_choice.0 == choice %}
+                                              {{ status_choice.1|default:choice|title }}
+                                          {% endif %}
+                                      {% endfor %}
+                                  </option>
+                              {% endfor %}
+                          </select>
+                      </form>
+                  </div>
+                  <div class="order-list">
+                      {% if orders %}
+                          <table class="table table-striped">
+                              <thead>
+                                  <tr>
+                                      <th>Mã đơn</th>
+                                      <th>Ngày đặt</th>
+                                      <th>Tổng tiền</th>
+                                      <th>Hình thức</th>
+                                      <th>Trạng thái đơn</th>
+                                      <th>Trạng thái thanh toán</th>
+                                      <th>Thao tác</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  {% for order in orders %}
+                                      <tr>
+                                          <td>#{{ order.id }}</td>
+                                          <td>{{ order.created_at|date:"d/m/Y H:i" }}</td>
+                                          <td>{{ order.total_price|floatformat:0|intcomma }}đ</td>
+                                          <td>{{ order.get_payment_method_display }}</td>
+                                          <td>{{ order.get_status_display }}</td>
+                                          <td>{{ order.get_payment_status_display }}</td>
+                                          <td>
+                                              <a href="{% url 'orders:order_detail' order_id=order.id %}" class="btn btn-info btn-sm">Xem chi tiết</a>
+                                          </td>
+                                      </tr>
+                                  {% empty %}
+                                      <tr>
+                                          <td colspan="5">Không có đơn hàng nào.</td>
+                                      </tr>
+                                  {% endfor %}
+                              </tbody>
+                          </table>
+                          {% if has_more %}
+                              <a href="?offset={{ offset }}&status={{ status_filter }}" class="btn btn-secondary mt-3" id="show-btn-order">Xem tiếp</a>
+                          {% else %}
+                              <a href="?offset=0&status={{ status_filter }}" class="btn btn-secondary mt-3" id="hide-btn-order" style="display: none;">Ẩn bớt</a>
+                          {% endif %}
+                      {% else %}
+                          <p>Không có đơn hàng nào để hiển thị.</p>
+                      {% endif %}
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  <!-- /SECTION -->
+  <script src="{% static 'js/order.js' %}"></script>
+{% endblock %}

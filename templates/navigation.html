@@ -1,0 +1,66 @@
+<div class="container">
+    <!-- responsive-nav -->
+    <div id="responsive-nav">
+        <!-- NAV -->
+        <ul class="main-nav nav navbar-nav">
+            <li class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}"><a href="{% url 'core:index' %}"><i class="fa-solid fa-house"></i> Trang chủ</a></li>
+            <li class="{% if request.resolver_match.url_name == 'comic_list' %}active{% endif %}"><a href="{% url 'comics:comic_list' %}"><i class="fa-solid fa-box-open"></i> Sản phẩm</a></li>
+            <li class="dropdown {% if request.resolver_match.url_name in 'comic_categories_by_slug comic_categories_by_author comic_categories_by_publisher comic_categories_by_price' %}active{% endif %}">
+                <a class="dropdown-toggle"><i class="fa-solid fa-list"></i> Danh mục</a>
+                <div class="dropdown-menu">
+                    <div class="dropdown-content">
+                        <div class="column category">
+                            <h3>Thể loại</h3>
+                            {% for category in categories %}
+                                <a href="{% url 'comics:comic_categories_by_slug' slug=category.slug %}">{{ category.name }}</a>
+                            {% empty %}
+                                <p>Chưa có thể loại</p>
+                            {% endfor %}
+                        </div>
+                        <div class="column author">
+                            <h3>Tác giả</h3>
+                            {% for author in authors %}
+                                <a href="{% url 'comics:comic_categories_by_author' author=author.author %}">{{ author.author }}</a>
+                            {% empty %}
+                                <p>Chưa có tác giả</p>
+                            {% endfor %}
+                        </div>
+                        <div class="column publisher">
+                            <h3>Nhà xuất bản</h3>
+                            {% for publisher in publishers %}
+                                {% if publisher.publisher %}
+                                    <a href="{% url 'comics:comic_categories_by_publisher' publisher=publisher.publisher %}">{{ publisher.publisher }}</a>
+                                {% endif %}
+                            {% empty %}
+                                <p>Chưa có nhà xuất bản</p>
+                            {% endfor %}
+                        </div>
+                        <div class="column price">
+                            <h3>Mức giá</h3>
+                            {% for price_range in price_ranges %}
+                                {% if price_range.max %}
+                                    <a href="{% url 'comics:comic_categories_by_price' min_price=price_range.min max_price=price_range.max %}">{{ price_range.name }}</a>
+                                {% else %}
+                                    <a href="{% url 'comics:comic_categories_by_price' min_price=price_range.min %}">{{ price_range.name }}</a>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </li>
+            {% if user.is_authenticated %}
+                <li class="{% if request.resolver_match.url_name == 'orders' %}active{% endif %}"><a href="{% url 'orders:orders' %}"><i class="fa-solid fa-clipboard-list"></i> Đơn hàng</a></li>
+                <li class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}"><a href="{% url 'accounts:profile' %}"><i class="fa-solid fa-user"></i> Tài khoản</a></li>
+                <li class="{% if request.resolver_match.url_name == 'view_history' %}active{% endif %}"><a href="{% url 'comics:view_history' %}"><i class="fas fa-eye"></i></i> Lịch sử xem</a></li>
+                <li class="{% if request.resolver_match.url_name == 'logout' %}active{% endif %}"><a id="logout-btn" href="{% url 'accounts:logout' %}"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a></li>
+            {% else %}
+                <li class="{% if request.resolver_match.url_name == 'register' %}active{% endif %}"><a href="{% url 'accounts:register' %}"><i class="fa-solid fa-user-plus"></i> Đăng ký</a></li>
+                <li class="{% if request.resolver_match.url_name == 'login' %}active{% endif %}"><a class="login-btn" data-toggle="modal" data-target="#largeModal"><i class="fa-solid fa-right-to-bracket"></i> Đăng nhập</a></li>
+            {% endif %}
+        </ul>
+        <!-- /NAV -->
+    </div>
+    <!-- /responsive-nav -->
+</div>
+
+	

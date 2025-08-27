@@ -1,0 +1,105 @@
+<div class="row">
+    <!-- Rating -->
+    <div class="col-md-3">
+        <div id="rating">
+            <div class="rating-avg">
+                <span>{{ average_rating|floatformat:1 }}</span>
+                <div class="rating-stars">
+                    {% for i in "xxxxx"|make_list %}
+                        {% if forloop.counter <= average_rating|floatformat:0 %}
+                            <i class="fa fa-star"></i>
+                        {% else %}
+                            <i class="fa fa-star-o"></i>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            <ul class="rating">
+                {% for i in "54321"|make_list %}
+                    <li>
+                        <div class="rating-stars">
+                            {% for j in "xxxxx"|make_list %}
+                                {% if forloop.parentloop.counter <= i %}
+                                    <i class="fa fa-star"></i>
+                                {% else %}
+                                    <i class="fa fa-star-o"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <div class="rating-progress">
+                            <div style="width: {{ rating_percentages|slice:forloop.counter0 }}%;"></div>
+                        </div>
+                        <span class="sum">{{ rating_counts|slice:forloop.counter0 }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <!-- /Rating -->
+
+    <!-- Reviews -->
+    <div class="col-md-6">
+        <div id="reviews">
+            <ul class="reviews">
+                {% for review in reviews %}
+                    <li>
+                        <div class="review-heading">
+                            <h5 class="name">{{ review.user.username }}</h5>
+                            <p class="date">{{ review.created_at|date:"d M Y, H:i A" }}</p>
+                            <div class="review-rating">
+                                {% for i in "xxxxx"|make_list %}
+                                    {% if forloop.counter <= review.rating %}
+                                        <i class="fa fa-star"></i>
+                                    {% else %}
+                                        <i class="fa fa-star-o empty"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="review-body">
+                            <p>{{ review.comment|default:"Không có nhận xét" }}</p>
+                        </div>
+                    </li>
+                {% empty %}
+                    <li>Chưa có nhận xét nào.</li>
+                {% endfor %}
+            </ul>
+            {% if page_obj.has_other_pages %}
+                <ul class="reviews-pagination">
+                    {% if page_obj.has_previous %}
+                        <li><a href="?page={{ page_obj.previous_page_number }}">&lt;</a></li>
+                    {% endif %}
+                    {% for num in page_obj.paginator.page_range %}
+                        <li class="{% if page_obj.number == num %}active{% endif %}">
+                            <a href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                        <li><a href="?page={{ page_obj.next_page_number }}">&gt;</a></li>
+                    {% endif %}
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Review Form -->
+    <div class="col-md-3">
+        <div id="review-form" data-comic-id="{{ comic.id }}">
+            <form class="review-form">
+                <textarea class="input" placeholder="Đánh giá của bạn" name="review"></textarea>
+                <div class="input-rating">
+                    <span>Đánh giá của bạn: </span>
+                    <div class="stars">
+                        <input id="star5" name="rating" value="5" type="radio"><label for="star5"></label>
+                        <input id="star4" name="rating" value="4" type="radio"><label for="star4"></label>
+                        <input id="star3" name="rating" value="3" type="radio"><label for="star3"></label>
+                        <input id="star2" name="rating" value="2" type="radio"><label for="star2"></label>
+                        <input id="star1" name="rating" value="1" type="radio"><label for="star1"></label>
+                    </div>
+                </div>
+                <button type="submit" class="primary-btn">Gửi</button>
+            </form>
+        </div>
+    </div>
+    <!-- /Review Form -->
+</div>

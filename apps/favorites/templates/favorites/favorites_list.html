@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Comics- Danh sách yêu thích{% endblock %}
+{% block content %}
+    <!-- BREADCRUMB -->
+    <div id="breadcrumb" class="section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <ul class="breadcrumb-tree">
+                        <li><a href="{% url 'core:index' %}">Trang chủ</a></li>
+                        <li class="active">Danh sách yêu thích</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /BREADCRUMB -->
+
+    <!-- SECTION -->
+    <div class="section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="title">Danh sách yêu thích</h3>
+                    <div class="data-comic-favorite">
+                        {% if favorites %}
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">Truyện</th>
+                                            <th class="text-center">Ảnh</th>
+                                            <th class="text-center">Giá</th>
+                                            <th class="text-center">Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for favorite in favorites %}
+                                            <tr class="comic_favorite_list" data-comic-id="{{ favorite.comic.id }}">
+                                                <td>
+                                                    <a href="{% url 'comics:comic_detail' slug=favorite.comic.slug %}">{{ favorite.comic.name }}</a>
+                                                </td>
+                                                <td class="text-center">
+                                                    <a href="{% url 'comics:comic_detail' slug=favorite.comic.slug %}">
+                                                        <img src="{{ favorite.comic.cover_image.url }}" alt="{{ favorite.comic.name }}" style="max-width: 60px;">
+                                                    </a>
+                                                </td>
+                                                <td class="text-center">{{ favorite.comic.discounted_price|intcomma }}đ</td>
+                                                <td class="text-center">
+                                                    <button onclick="addAndRemove({{ favorite.comic.id }})" class="btn btn-primary btn-sm">Thêm vào giỏ</button>
+                                                    <button class="btn btn-danger btn-sm" onclick="removeFromFavorite({{ favorite.comic.id }})">Xóa</button>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-center">Bạn chưa có truyện nào trong danh sách yêu thích.</p>
+                            <div class="text-center">
+                                <a href="{% url 'core:index' %}" class="btn btn-primary">Tìm sản phẩm yêu thích</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /SECTION -->
+{% endblock %}

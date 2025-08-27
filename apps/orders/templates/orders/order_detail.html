@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load order_tags %}
+{% block title %}Comics - Chi tiết đơn hàng{% endblock %}
+{% block content %}
+  <!-- BREADCRUMB -->
+  <div id="breadcrumb" class="section">
+      <div class="container">
+          <div class="row">
+              <div class="col-md-12">
+                  <ul class="breadcrumb-tree">
+                      <li><a href="{% url 'core:index' %}">Trang chủ</a></li>
+                      <li><a href="{% url 'orders:orders' %}">Đơn hàng</a></li>
+                      <li class="active">Chi tiết đơn hàng</li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+  </div>
+  <!-- /BREADCRUMB -->
+
+  <!-- SECTION -->
+  <div class="section">
+      <div class="container">
+          <div class="row">
+              <div class="col-md-12">
+                  <div class="section-title">
+                      <h3 class="title">Chi tiết đơn hàng #{{ order.id }}</h3>
+                  </div>
+                  <div class="order-summary">
+                      <p><strong>Ngày đặt:</strong> {{ order.created_at|date:"d/m/Y" }}</p>
+                      <p><strong>Hình thức:</strong> {{ order.get_payment_method_display }}</p>
+                        <p><strong>Trạng thái đơn:</strong> <span id="order-status">{{ order.get_status_display }}</span></p>
+                        <p><strong>Trạng thái thanh toán:</strong> <span id="payment-status">{{ order.get_payment_status_display }}</span></p>
+                      <p><strong>Tổng tiền:</strong> {{ order.total_price|floatformat:0|intcomma }}đ</p>
+                      <table class="table table-bordered">
+                          <thead>
+                              <tr>
+                                  <th class="text-center">Truyện</th>
+                                  <th class="text-center">Số lượng</th>
+                                  <th class="text-center">Giá</th>
+                                  <th class="text-center">Thành tiền</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for item in order.items.all %}
+                              <tr>
+                                  <td><a href="{% url 'comics:comic_detail' slug=item.comic.slug %}">{{ item.comic.name }}</a></td>
+                                  <td class="text-center">{{ item.quantity }}</td>
+                                  <td class="text-center">{{ item.price|floatformat:0|intcomma }}đ</td>
+                                  <td class="text-center">{{ item.quantity|multiply:item.price|intcomma }}đ</td>
+                              </tr>
+                              {% endfor %}
+                              <tr>
+                                <th class="text-left" colspan="3">Phí vận chuyển</th>
+                                <td class="text-center"><b>{{ shipping_fee|intcomma }}đ</b></td>
+                            </tr>
+                          </tbody>
+                      </table>
+                      <div style="text-align: right;">
+                        {% if is_cancel %}
+                            <button class="btn btn-danger action-order" data-action="cancel" data-order-id="{{ order.id }}">
+                                Hủy đơn
+                            </button>
+                        {% elif is_return %}
+                            <button class="btn btn-warning action-order" data-action="return" data-order-id="{{ order.id }}">
+                                Trả hàng
+                            </button>
+                        {% endif %}
+                      </div>
+                      <div><button class="btn"><a href="{% url 'orders:orders' %}" >Quay lại</a></button></div>
+
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  <!-- /SECTION -->
+{% endblock %}

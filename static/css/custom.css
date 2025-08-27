@@ -1,0 +1,25 @@
+#id_is_active {
+  display: flex;
+}
+
+/* Xóa nền background chứa các nút trong khu vực submit */
+.submit-row {
+  background: none !important;
+  border: none !important;
+}
+
+.change-list table#result_list th,
+.change-list table#result_list td {
+  text-align: center;
+}
+
+.change-list table#result_list th a,
+.change-list table#result_list td a {
+  text-align: center;
+  text-decoration: none;
+}
+
+.change-list table#result_list th a:hover,
+.change-list table#result_list td a:hover {
+  text-decoration: underline;
+}
